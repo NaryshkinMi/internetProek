@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Главная - Планировщик задач{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-4 mb-4">
+        <i class="bi bi-calendar-check text-primary"></i> TaskPlanner
+    </h1>
+    <p class="lead mb-4">
+        Управляйте своими задачами эффективно с нашим планировщиком
+    </p>
+    
+    {% if not current_user.is_authenticated %}
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="d-grid gap-3">
+                    <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-box-arrow-in-right"></i> Войти
+                    </a>
+                    <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg">
+                        <i class="bi bi-person-plus"></i> Зарегистрироваться
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="d-grid gap-3">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-list-task"></i> Перейти к задачам
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<div class="row mt-5 g-4">
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-plus-circle display-1 text-primary"></i>
+                <h3 class="card-title mt-3">Создавайте задачи</h3>
+                <p class="card-text">Добавляйте новые задачи с описанием и датой выполнения</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-calendar display-1 text-primary"></i>
+                <h3 class="card-title mt-3">Планируйте</h3>
+                <p class="card-text">Используйте календарь для удобного планирования</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="bi bi-check-circle display-1 text-primary"></i>
+                <h3 class="card-title mt-3">Отслеживайте</h3>
+                <p class="card-text">Отмечайте выполненные задачи и следите за прогрессом</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
