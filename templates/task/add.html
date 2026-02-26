@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Новая задача{% endblock %}
+
+{% block content %}
+<div class="notion-container" style="max-width: 700px;">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{{ url_for('dashboard') }}" class="notion-btn notion-btn-sm">
+            <i class="bi bi-arrow-left"></i> Назад
+        </a>
+        <h1 class="notion-h2 mb-0">
+            <i class="bi bi-plus-circle"></i> Новая задача
+        </h1>
+    </div>
+
+    <div class="notion-card">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <!-- Название -->
+            <div class="notion-form-group">
+                <label class="notion-label">{{ form.title.label }}</label>
+                {{ form.title(class="notion-input", placeholder="Введите название задачи...") }}
+                {% for error in form.title.errors %}
+                <small class="text-red">{{ error }}</small>
+                {% endfor %}
+            </div>
+
+            <!-- Описание -->
+            <div class="notion-form-group">
+                <label class="notion-label">{{ form.description.label }}</label>
+                {{ form.description(class="notion-textarea", placeholder="Добавьте описание...", rows=4) }}
+            </div>
+
+            <!-- Детали задачи (сетка) -->
+            <div class="row g-3 mb-3">
+                <!-- Дата -->
+                <div class="col-md-6">
+                    <div class="notion-form-group">
+                        <label class="notion-label">{{ form.due_date.label }}</label>
+                        {{ form.due_date(class="notion-input", type="date") }}
+                    </div>
+                </div>
+
+                <!-- Приоритет -->
+                <div class="col-md-6">
+                    <div class="notion-form-group">
+                        <label class="notion-label">{{ form.priority.label }}</label>
+                        {{ form.priority(class="notion-select") }}
+                    </div>
+                </div>
+
+                <!-- Категория -->
+                <div class="col-md-6">
+                    <div class="notion-form-group">
+                        <label class="notion-label">{{ form.category_id.label }}</label>
+                        {{ form.category_id(class="notion-select") }}
+                        <small class="text-muted">
+                            <a href="{{ url_for('add_category') }}">+ Новая категория</a>
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Теги -->
+                <div class="col-md-6">
+                    <div class="notion-form-group">
+                        <label class="notion-label">{{ form.tags.label }}</label>
+                        {{ form.tags(class="notion-input", placeholder="работа, личное, срочно") }}
+                    </div>
+                </div>
+
+                <!-- Статус -->
+                <div class="col-md-6">
+                    <div class="notion-form-group">
+                        <label class="notion-label">{{ form.status.label }}</label>
+                        {{ form.status(class="notion-select") }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Кнопки -->
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="notion-btn notion-btn-primary">
+                    <i class="bi bi-check-lg"></i> Создать задачу
+                </button>
+                <a href="{{ url_for('dashboard') }}" class="notion-btn">
+                    Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

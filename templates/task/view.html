@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block content %}
+<div class="notion-container" style="max-width: 800px;">
+    <!-- Шапка с действиями -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ url_for('dashboard') }}" class="notion-btn notion-btn-sm">
+                <i class="bi bi-arrow-left"></i> Назад
+            </a>
+            <h1 class="notion-h2 mb-0">
+                {{ task.title }}
+            </h1>
+        </div>
+
+        <div class="d-flex gap-2">
+            {% if can_edit %}
+            <a href="{{ url_for('edit_task', id=task.id) }}" class="notion-btn" title="Редактировать">
+                <i class="bi bi-pencil"></i>
+            </a>
+            {% endif %}
+            <a href="{{ url_for('share_task', id=task.id) }}" class="notion-btn" title="Поделиться">
+                <i class="bi bi-share"></i>
+            </a>
+            {% if task.user_id == current_user.id %}
+            <a href="{{ url_for('delete_task', id=task.id) }}"
+               class="notion-btn notion-btn-danger"
+               onclick="return confirmDelete('Удалить задачу?')"
+               title="Удалить">
+                <i class="bi bi-trash"></i>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Основная информация -->
+    <div class="notion-card">
+        <!-- Мета-информация -->
+        <div class="d-flex flex-wrap gap-3 mb-4 pb-3 border-bottom">
+            <!-- Статус -->
+            <div>
+                <span class="text-muted">Статус:</span>
+                <span class="badge bg-{{ task.get_status_badge() }} ms-2">
+                    {% if task.status == 'active' %}Активна
+                    {% elif task.status == 'completed' %}Выполнена
+                    {% else %}В архиве{% endif %}
+                </span>
+            </div>
+
+            <!-- Приоритет -->
+            <div>
+                <span class="text-muted">Приоритет:</span>
+                <span class="task-priority {{ task.get_priority_class() }} ms-2">
+                    {{ task.get_priority_name() }}
+                </span>
+            </div>
+
+            <!-- Дата -->
+            {% if task.due_date %}
+            <div>
+                <span class="text-muted">Срок:</span>
+                <span class="ms-2 {% if task.due_date < now and task.status != 'completed' %}text-red{% endif %}">
+                    <i class="bi bi-calendar"></i> {{ task.due_date.strftime('%d.%m.%Y') }}
+                </span>
+            </div>
+            {% endif %}
+
+            <!-- Автор -->
+            <div>
+                <span class="text-muted">Автор:</span>
+                <span class="ms-2">{{ task.owner.username }}</span>
+            </div>
+        </div>
+
+        <!-- Категория -->
+        {% if task.category %}
+        <div class="mb-3">
+            <span class="text-muted">Категория:</span>
+            <span class="category-chip ms-2">
+                <span class="category-color" style="background-color: {{ task.category.color }}"></span>
+                {{ task.category.icon }} {{ task.category.name }}
+            </span>
+        </div>
+        {% endif %}
+
+        <!-- Теги -->
+        {% if task.tags %}
+        <div class="mb-3">
+            <span class="text-muted">Теги:</span>
+            <div class="task-tags d-inline-flex ms-2">
+                {% for tag in task.tags %}
+                <span class="task-tag" style="border-left-color: {{ tag.color }};">{{ tag.name }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Описание -->
+        {% if task.description %}
+        <div class="mt-4">
+            <h3 class="notion-h3">Описание</h3>
+            <div class="p-3 bg-gray rounded" style="white-space: pre-wrap;">
+                {{ task.description }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Информация о создании/обновлении -->
+        <div class="mt-4 pt-3 border-top text-muted small">
+            <div>Создано: {{ task.created_at.strftime('%d.%m.%Y %H:%M') }}</div>
+            {% if task.updated_at and task.updated_at != task.created_at %}
+            <div>Обновлено: {{ task.updated_at.strftime('%d.%m.%Y %H:%M') }}</div>
+            {% endif %}
+            {% if task.completed_at %}
+            <div>Выполнено: {{ task.completed_at.strftime('%d.%m.%Y %H:%M') }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Доступ для совместной работы -->
+    {% if task.user_id == current_user.id %}
+    <div class="notion-card mt-3">
+        <h3 class="notion-h3 mb-3">
+            <i class="bi bi-people"></i> Доступ к задаче
+        </h3>
+
+        {% if task.shared_with %}
+        <div class="mb-3">
+            <div class="text-muted mb-2">Пользователи с доступом:</div>
+            <div class="d-flex flex-wrap gap-2">
+                {% for user in task.shared_with %}
+                <div class="d-flex align-items-center gap-2 p-2 bg-gray rounded">
+                    <span class="avatar avatar-sm">{{ user.username[0]|upper }}</span>
+                    <span>{{ user.username }}</span>
+                    <span class="text-muted small">({{ user.email }})</span>
+                    <a href="{{ url_for('revoke_access', id=task.id, user_id=user.id) }}"
+                       class="text-muted"
+                       onclick="return confirmDelete('Отозвать доступ?')"
+                       title="Отозвать доступ">
+                        <i class="bi bi-x"></i>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <p class="text-muted">Нет пользователей с доступом</p>
+        {% endif %}
+
+        <a href="{{ url_for('share_task', id=task.id) }}" class="notion-btn notion-btn-sm">
+            <i class="bi bi-plus"></i> Добавить пользователя
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

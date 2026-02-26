@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Редактировать тег{% endblock %}
+
+{% block content %}
+<div class="notion-container" style="max-width: 500px;">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{{ url_for('list_tags') }}" class="notion-btn notion-btn-sm">
+            <i class="bi bi-arrow-left"></i> Назад
+        </a>
+        <h1 class="notion-h2 mb-0">
+            <i class="bi bi-pencil"></i> Редактировать тег
+        </h1>
+    </div>
+
+    <div class="notion-card">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <div class="notion-form-group">
+                <label class="notion-label">{{ form.name.label }}</label>
+                {{ form.name(class="notion-input") }}
+                {% for error in form.name.errors %}
+                <small class="text-red">{{ error }}</small>
+                {% endfor %}
+            </div>
+
+            <div class="notion-form-group">
+                <label class="notion-label">{{ form.color.label }}</label>
+                <div class="d-flex gap-2">
+                    <input type="color" name="{{ form.color.name }}" value="{{ form.color.data }}" class="form-control form-control-color" style="width: 60px; height: 40px;">
+                    {{ form.color(class="notion-input") }}
+                </div>
+                {% for error in form.color.errors %}
+                <small class="text-red">{{ error }}</small>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="notion-btn notion-btn-primary w-100">
+                <i class="bi bi-check-lg"></i> Сохранить изменения
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

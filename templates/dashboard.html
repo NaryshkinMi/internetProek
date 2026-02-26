@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Мои задачи{% endblock %}
+
+{% block content %}
+<div class="notion-container">
+    <!-- Заголовок страницы -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="notion-h1">
+            <i class="bi bi-check2-square"></i> Мои задачи
+        </h1>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('add_task') }}" class="notion-btn notion-btn-primary">
+                <i class="bi bi-plus"></i> Новая задача
+            </a>
+            <button class="notion-btn" onclick="document.getElementById('filters-section').classList.toggle('d-none')">
+                <i class="bi bi-funnel"></i> Фильтры
+            </button>
+        </div>
+    </div>
+
+    <!-- Статистика -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total }}</div>
+            <div class="stat-label">Всего задач</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.active }}</div>
+            <div class="stat-label">Активных</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.completed }}</div>
+            <div class="stat-label">Выполнено</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value {% if stats.overdue > 0 %}text-red{% endif %}">{{ stats.overdue }}</div>
+            <div class="stat-label">Просрочено</div>
+        </div>
+    </div>
+
+    <!-- Фильтры -->
+    <div id="filters-section" class="filters-bar {% if filter_status == 'active' and filter_category == 'all' and filter_priority == 'all' %}d-none{% endif %}">
+        <div class="filter-item">
+            <select class="notion-select" onchange="window.location.href='?status='+this.value+'&category={{ filter_category }}&priority={{ filter_priority }}'">
+                <option value="all" {% if filter_status == 'all' %}selected{% endif %}>Все статусы</option>
+                <option value="active" {% if filter_status == 'active' %}selected{% endif %}>Активные</option>
+                <option value="completed" {% if filter_status == 'completed' %}selected{% endif %}>Выполненные</option>
+                <option value="archived" {% if filter_status == 'archived' %}selected{% endif %}>В архиве</option>
+            </select>
+        </div>
+
+        <div class="filter-item">
+            <select class="notion-select" onchange="window.location.href='?status={{ filter_status }}&category='+this.value+'&priority={{ filter_priority }}'">
+                <option value="all" {% if filter_category == 'all' %}selected{% endif %}>Все категории</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if filter_category == category.id|string %}selected{% endif %}>
+                    {{ category.icon }} {{ category.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-item">
+            <select class="notion-select" onchange="window.location.href='?status={{ filter_status }}&category={{ filter_category }}&priority='+this.value">
+                <option value="all" {% if filter_priority == 'all' %}selected{% endif %}>Все приоритеты</option>
+                <option value="1" {% if filter_priority == '1' %}selected{% endif %}>Низкий</option>
+                <option value="2" {% if filter_priority == '2' %}selected{% endif %}>Средний</option>
+                <option value="3" {% if filter_priority == '3' %}selected{% endif %}>Высокий</option>
+                <option value="4" {% if filter_priority == '4' %}selected{% endif %}>Критический</option>
+            </select>
+        </div>
+
+        <a href="{{ url_for('dashboard') }}" class="notion-btn notion-btn-sm">
+            <i class="bi bi-x"></i> Сбросить
+        </a>
+    </div>
+
+    <!-- Список задач -->
+    {% if tasks %}
+    <div class="notion-card" style="padding: 0; overflow: hidden;">
+        {% for task in tasks %}
+        <div class="task-item">
+            <div class="task-checkbox">
+                <input type="checkbox"
+                       {% if task.status == 'completed' %}checked{% endif %}
+                       onchange="window.location.href='{{ url_for('toggle_task', id=task.id) }}'">
+            </div>
+
+            <div class="task-content">
+                <div class="task-title {% if task.status == 'completed' %}completed{% endif %}">
+                    <a href="{{ url_for('view_task', id=task.id) }}">
+                        {{ task.title }}
+                    </a>
+                </div>
+
+                <div class="task-meta">
+                    {% if task.category %}
+                    <span class="category-chip">
+                        <span class="category-color" style="background-color: {{ task.category.color }}"></span>
+                        {{ task.category.icon }} {{ task.category.name }}
+                    </span>
+                    {% endif %}
+
+                    <span class="task-priority {{ task.get_priority_class() }}">
+                        {{ task.get_priority_name() }}
+                    </span>
+
+                    {% if task.due_date %}
+                    <span class="{% if task.due_date < now and task.status != 'completed' %}text-red{% endif %}">
+                        <i class="bi bi-calendar"></i> {{ task.due_date.strftime('%d.%m.%Y') }}
+                    </span>
+                    {% endif %}
+
+                    {% if task.tags %}
+                    <div class="task-tags">
+                        {% for tag in task.tags %}
+                        <span class="task-tag" style="border-left-color: {{ tag.color }};">{{ tag.name }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="task-actions">
+                <a href="{{ url_for('edit_task', id=task.id) }}" class="notion-btn notion-btn-sm" title="Редактировать">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{{ url_for('share_task', id=task.id) }}" class="notion-btn notion-btn-sm" title="Поделиться">
+                    <i class="bi bi-share"></i>
+                </a>
+                <a href="{{ url_for('delete_task', id=task.id) }}"
+                   class="notion-btn notion-btn-sm notion-btn-danger"
+                   onclick="return confirmDelete('Удалить задачу?')"
+                   title="Удалить">
+                    <i class="bi bi-trash"></i>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Пустое состояние -->
+    <div class="notion-card text-center py-5">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+        <h3 class="notion-h3 mt-3">Здесь пока ничего нет</h3>
+        <p class="text-muted mb-4">Создайте свою первую задачу, чтобы начать планирование</p>
+        <a href="{{ url_for('add_task') }}" class="notion-btn notion-btn-primary">
+            <i class="bi bi-plus"></i> Создать задачу
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

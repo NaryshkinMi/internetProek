@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Доступные мне задачи{% endblock %}
+
+{% block content %}
+<div class="notion-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="notion-h1">
+            <i class="bi bi-people"></i> Доступные мне задачи
+        </h1>
+        <a href="{{ url_for('dashboard') }}" class="notion-btn">
+            <i class="bi bi-arrow-left"></i> К моим задачам
+        </a>
+    </div>
+
+    {% if tasks %}
+    <div class="notion-card" style="padding: 0; overflow: hidden;">
+        {% for task in tasks %}
+        <div class="task-item">
+            <div class="task-content">
+                <div class="task-title">
+                    <a href="{{ url_for('view_task', id=task.id) }}" class="text-decoration-none text-dark">
+                        {{ task.title }}
+                    </a>
+                </div>
+
+                <div class="task-meta">
+                    <!-- Автор задачи -->
+                    <span class="d-flex align-items-center gap-1">
+                        <i class="bi bi-person-circle"></i>
+                        {{ task.owner.username }}
+                    </span>
+
+                    <!-- Приоритет -->
+                    <span class="task-priority priority-{{ task.priority }}">
+                        {{ task.get_priority_name() }}
+                    </span>
+
+                    <!-- Дата -->
+                    {% if task.due_date %}
+                    <span>
+                        <i class="bi bi-calendar"></i> {{ task.due_date.strftime('%d.%m.%Y') }}
+                    </span>
+                    {% endif %}
+
+                    <!-- Категория -->
+                    {% if task.category %}
+                    <span class="category-chip">
+                        <span class="category-color" style="background-color: {{ task.category.color }}"></span>
+                        {{ task.category.icon }} {{ task.category.name }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="task-actions">
+                <a href="{{ url_for('view_task', id=task.id) }}" class="notion-btn notion-btn-sm" title="Просмотр">
+                    <i class="bi bi-eye"></i>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Пустое состояние -->
+    <div class="notion-card text-center py-5">
+        <i class="bi bi-people display-1 text-muted"></i>
+        <h3 class="notion-h3 mt-3">Нет доступных задач</h3>
+        <p class="text-muted mb-4">
+            Здесь появятся задачи, которыми с вами поделятся другие пользователи
+        </p>
+        <a href="{{ url_for('dashboard') }}" class="notion-btn notion-btn-primary">
+            <i class="bi bi-list-task"></i> К моим задачам
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

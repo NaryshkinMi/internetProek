@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Новая категория{% endblock %}
+
+{% block content %}
+<div class="notion-container" style="max-width: 500px;">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{{ url_for('list_categories') }}" class="notion-btn notion-btn-sm">
+            <i class="bi bi-arrow-left"></i> Назад
+        </a>
+        <h1 class="notion-h2 mb-0">
+            <i class="bi bi-plus-circle"></i> Новая категория
+        </h1>
+    </div>
+
+    <div class="notion-card">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <div class="notion-form-group">
+                <label class="notion-label">{{ form.name.label }}</label>
+                {{ form.name(class="notion-input", placeholder="Работа, Личное, Проект...") }}
+                {% for error in form.name.errors %}
+                <small class="text-red">{{ error }}</small>
+                {% endfor %}
+            </div>
+
+            <div class="notion-form-group">
+                <label class="notion-label">{{ form.icon.label }}</label>
+                {{ form.icon(class="notion-input", placeholder="📁") }}
+                <small class="text-muted">Можно использовать эмодзи</small>
+            </div>
+
+            <div class="notion-form-group">
+                <label class="notion-label">{{ form.color.label }}</label>
+                <div class="d-flex gap-2">
+                    <input type="color" name="{{ form.color.name }}" value="{{ form.color.data or '#667eea' }}" class="form-control form-control-color" style="width: 60px; height: 40px;">
+                    {{ form.color(class="notion-input", placeholder="#667eea") }}
+                </div>
+                {% for error in form.color.errors %}
+                <small class="text-red">{{ error }}</small>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="notion-btn notion-btn-primary w-100">
+                <i class="bi bi-check-lg"></i> Создать категорию
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

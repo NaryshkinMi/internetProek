@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Поделиться задачей{% endblock %}
+
+{% block content %}
+<div class="notion-container" style="max-width: 600px;">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{{ url_for('view_task', id=task.id) }}" class="notion-btn notion-btn-sm">
+            <i class="bi bi-arrow-left"></i> Назад
+        </a>
+        <h1 class="notion-h2 mb-0">
+            <i class="bi bi-share"></i> Поделиться задачей
+        </h1>
+    </div>
+
+    <div class="notion-card">
+        <h3 class="notion-h3 mb-3">{{ task.title }}</h3>
+
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <div class="notion-form-group">
+                <label class="notion-label">{{ form.email.label }}</label>
+                {{ form.email(class="notion-input", placeholder="email@example.com") }}
+                {% for error in form.email.errors %}
+                <small class="text-red">{{ error }}</small>
+                {% endfor %}
+            </div>
+
+            <div class="notion-form-group">
+                <label class="notion-label">{{ form.permission.label }}</label>
+                {{ form.permission(class="notion-select") }}
+                <small class="text-muted d-block mt-1">
+                    <i class="bi bi-info-circle"></i>
+                    Просмотр: только видеть задачу<br>
+                    Редактирование: изменять и отмечать выполнение
+                </small>
+            </div>
+
+            <button type="submit" class="notion-btn notion-btn-primary">
+                <i class="bi bi-check-lg"></i> Предоставить доступ
+            </button>
+        </form>
+    </div>
+
+    <!-- Список пользователей с доступом -->
+    {% if shared_users %}
+    <div class="notion-card mt-3">
+        <h4 class="notion-h3">Уже имеют доступ</h4>
+
+        <div class="d-flex flex-column gap-2">
+            {% for user in shared_users %}
+            <div class="d-flex justify-content-between align-items-center p-2 bg-gray rounded">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="avatar avatar-sm">{{ user.username[0]|upper }}</span>
+                    <span>{{ user.username }}</span>
+                    <span class="text-muted small">({{ user.email }})</span>
+                </div>
+                <a href="{{ url_for('revoke_access', id=task.id, user_id=user.id) }}"
+                   class="notion-btn notion-btn-sm notion-btn-danger"
+                   onclick="return confirmDelete('Отозвать доступ?')">
+                    <i class="bi bi-x"></i> Отозвать
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

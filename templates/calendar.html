@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Календарь{% endblock %}
+
+{% block content %}
+<div class="notion-container">
+    <h1 class="notion-h1 mb-4">
+        <i class="bi bi-calendar"></i> Календарь задач
+    </h1>
+
+    <div id="calendar"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'ru',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            buttonText: {
+                today: 'Сегодня',
+                month: 'Месяц',
+                week: 'Неделя',
+                day: 'День'
+            },
+            events: [
+                {% for task in tasks %}
+                {
+                    id: '{{ task.id }}',
+                    title: '{{ task.title|safe }}',
+                    start: '{{ task.due_date }}',
+                    description: '{{ task.description|safe if task.description else "" }}',
+                    url: '{{ url_for("view_task", id=task.id) }}',
+                    color: '{{ task.get_priority_color() }}',
+                    textColor: 'white',
+                    extendedProps: {
+                        status: '{{ task.status }}',
+                        priority: '{{ task.priority }}'
+                    }
+                },
+                {% endfor %}
+            ],
+            eventClick: function(info) {
+                info.jsEvent.preventDefault();
+                if (info.event.url) {
+                    window.location.href = info.event.url;
+                }
+            },
+            eventDidMount: function(info) {
+                if (info.event.extendedProps.description) {
+                    info.el.setAttribute('title', info.event.extendedProps.description);
+                }
+
+                if (info.event.extendedProps.status === 'completed') {
+                    info.el.style.opacity = '0.6';
+                    info.el.style.textDecoration = 'line-through';
+                }
+            }
+        });
+        calendar.render();
+    });
+</script>
+{% endblock %}

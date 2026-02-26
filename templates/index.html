@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Главная - Task Planner{% endblock %}
+
+{% block content %}
+<div class="notion-container" style="max-width: 1200px;">
+    <!-- Герой-секция (главный блок) -->
+    <div class="text-center py-5 mb-4">
+        <div class="display-1 mb-3">
+            <i class="bi bi-check2-square" style="color: var(--notion-blue); font-size: 4rem;"></i>
+        </div>
+        <h1 class="notion-h1" style="font-size: 3.5rem; margin-bottom: 1rem;">
+            Task Planner
+        </h1>
+        <p class="lead" style="font-size: 1.3rem; color: var(--notion-text-light); max-width: 600px; margin: 0 auto 2rem;">
+            Управляйте своими задачами эффективно с нашим планировщиком <br>в стиле Notion
+        </p>
+
+        {% if not current_user.is_authenticated %}
+        <div class="d-flex gap-3 justify-content-center">
+            <a href="{{ url_for('login') }}" class="notion-btn notion-btn-primary" style="padding: 12px 30px;">
+                <i class="bi bi-box-arrow-in-right"></i> Войти
+            </a>
+            <a href="{{ url_for('register') }}" class="notion-btn" style="padding: 12px 30px;">
+                <i class="bi bi-person-plus"></i> Зарегистрироваться
+            </a>
+        </div>
+        {% else %}
+        <a href="{{ url_for('dashboard') }}" class="notion-btn notion-btn-primary" style="padding: 12px 30px;">
+            <i class="bi bi-list-task"></i> Перейти к задачам
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Преимущества (карточки) -->
+    <div class="row g-4 mt-5">
+        <div class="col-md-4">
+            <div class="notion-card text-center h-100" style="padding: 2rem;">
+                <div class="display-3 mb-3" style="color: var(--notion-blue);">
+                    <i class="bi bi-plus-circle"></i>
+                </div>
+                <h3 class="notion-h3">Создавайте задачи</h3>
+                <p class="text-muted">
+                    Добавляйте новые задачи с описанием,
+                    приоритетом и датой выполнения
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="notion-card text-center h-100" style="padding: 2rem;">
+                <div class="display-3 mb-3" style="color: var(--notion-blue);">
+                    <i class="bi bi-calendar"></i>
+                </div>
+                <h3 class="notion-h3">Планируйте</h3>
+                <p class="text-muted">
+                    Используйте календарь для удобного
+                    планирования и визуализации задач
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="notion-card text-center h-100" style="padding: 2rem;">
+                <div class="display-3 mb-3" style="color: var(--notion-blue);">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <h3 class="notion-h3">Отслеживайте</h3>
+                <p class="text-muted">
+                    Отмечайте выполненные задачи и следите
+                    за прогрессом в реальном времени
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Дополнительные возможности -->
+    <div class="row mt-5 g-4">
+        <div class="col-md-6">
+            <div class="notion-card d-flex align-items-center gap-4 p-4">
+                <div style="font-size: 2.5rem;">
+                    <i class="bi bi-tags"></i>
+                </div>
+                <div>
+                    <h4 class="notion-h3 mb-2">Категории и теги</h4>
+                    <p class="text-muted mb-0">
+                        Организуйте задачи по категориям и добавляйте теги для быстрого поиска
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="notion-card d-flex align-items-center gap-4 p-4">
+                <div style="font-size: 2.5rem;">
+                    <i class="bi bi-flag"></i>
+                </div>
+                <div>
+                    <h4 class="notion-h3 mb-2">Приоритеты</h4>
+                    <p class="text-muted mb-0">
+                        Расставляйте приоритеты и не пропускайте важные задачи
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="notion-card d-flex align-items-center gap-4 p-4">
+                <div style="font-size: 2.5rem;">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div>
+                    <h4 class="notion-h3 mb-2">Совместная работа</h4>
+                    <p class="text-muted mb-0">
+                        Делитесь задачами с коллегами и работайте вместе
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="notion-card d-flex align-items-center gap-4 p-4">
+                <div style="font-size: 2.5rem;">
+                    <i class="bi bi-search"></i>
+                </div>
+                <div>
+                    <h4 class="notion-h3 mb-2">Быстрый поиск</h4>
+                    <p class="text-muted mb-0">
+                        Мгновенный поиск по всем задачам и описаниям
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer с призывом к действию -->
+    {% if not current_user.is_authenticated %}
+    <div class="text-center mt-5 pt-4 border-top">
+        <h2 class="notion-h2 mb-3">Готовы начать?</h2>
+        <p class="text-muted mb-4">Присоединяйтесь к тысячам пользователей, которые уже управляют своими задачами эффективно</p>
+        <a href="{{ url_for('register') }}" class="notion-btn notion-btn-primary" style="padding: 15px 40px; font-size: 1.2rem;">
+            <i class="bi bi-person-plus"></i> Создать аккаунт бесплатно
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
